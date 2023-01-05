@@ -41,9 +41,9 @@ class GalleryFragment : Fragment() {
         //val adapter = UnsplashPhotoAdapter()
         binding.apply {
             recyclerView.setHasFixedSize(true)
-           // recyclerView.adapter = adapter
+            // recyclerView.adapter = adapter
         }
-
+        println("Hello New commit")
 //        viewModel.photos.observe(viewLifecycleOwner) {
 //           // adapter.submitData(viewLifecycleOwner.lifecycle,it)
 //        }
