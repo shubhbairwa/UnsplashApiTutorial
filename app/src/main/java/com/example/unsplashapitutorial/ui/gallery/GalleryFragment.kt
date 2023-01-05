@@ -44,7 +44,6 @@ class GalleryFragment : Fragment() {
             // recyclerView.adapter = adapter
         }
         println("Hello New commit")
-        println("commit new message")
 //        viewModel.photos.observe(viewLifecycleOwner) {
 //           // adapter.submitData(viewLifecycleOwner.lifecycle,it)
 //        }
