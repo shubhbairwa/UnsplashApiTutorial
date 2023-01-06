@@ -15,12 +15,18 @@ class GalleryViewModel @Inject constructor(private val unsplashRepository: Unspl
     ViewModel() {
 
     private val currentQuery = MutableLiveData(DEFAULT_QUERY)
-//    val photos = currentQuery.switchMap {
-//        unsplashRepository.getSearchResult(it).cachedIn(viewModelScope)
-//    }
+
+
+    val photos = currentQuery.switchMap {
+        unsplashRepository.getSearchResult(it).cachedIn(viewModelScope)
+    }
+
+
+
+
 
     companion object {
-        const val DEFAULT_QUERY = "cats"
+        const val DEFAULT_QUERY = "iphone"
     }
 
     fun getSearchResult(query: String) {

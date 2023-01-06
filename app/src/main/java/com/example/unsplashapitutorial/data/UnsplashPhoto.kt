@@ -1,3 +1,5 @@
+package com.example.unsplashapitutorial.data
+
 import android.os.Parcelable
 
 import kotlinx.parcelize.Parcelize

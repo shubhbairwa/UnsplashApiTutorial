@@ -7,8 +7,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.example.unsplashapitutorial.R
+import com.example.unsplashapitutorial.adapter.UnsplashLoadStateAdapter
+import com.example.unsplashapitutorial.adapter.UnsplashPhotoAdapter
 import com.example.unsplashapitutorial.databinding.FragmentGalleryBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -38,15 +46,24 @@ class GalleryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentGalleryBinding.bind(view)
-        //val adapter = UnsplashPhotoAdapter()
+
+
+        val adapter = UnsplashPhotoAdapter()
+
         binding.apply {
             recyclerView.setHasFixedSize(true)
-            // recyclerView.adapter = adapter
+            recyclerView.adapter = adapter.withLoadStateHeaderAndFooter(
+                header = UnsplashLoadStateAdapter{adapter.retry()},
+                footer = UnsplashLoadStateAdapter{adapter.retry()},
+
+            )
         }
-        println("Hello New commit")
-//        viewModel.photos.observe(viewLifecycleOwner) {
-//           // adapter.submitData(viewLifecycleOwner.lifecycle,it)
-//        }
+
+
+        viewModel.photos.observe(viewLifecycleOwner) {
+            adapter.submitData(viewLifecycleOwner.lifecycle, it)
+        }
+
 
     }
 

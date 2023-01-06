@@ -1,7 +1,6 @@
 package com.example.unsplashapitutorial.data
 
-import UnsplashPhoto
-
 data class UnsplashResponse(
-    val result:List<UnsplashPhoto>
+    val results:List<UnsplashPhoto>,
+    val total_pages:Int?
 )
