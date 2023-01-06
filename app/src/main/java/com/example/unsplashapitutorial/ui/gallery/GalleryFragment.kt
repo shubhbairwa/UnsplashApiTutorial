@@ -1,11 +1,14 @@
 package com.example.unsplashapitutorial.ui.gallery
 
 import android.os.Bundle
+import android.view.*
+import android.widget.SearchView
+import androidx.appcompat.widget.SearchView.OnQueryTextListener
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import com.example.unsplashapitutorial.R
 import com.example.unsplashapitutorial.adapter.UnsplashLoadStateAdapter
 import com.example.unsplashapitutorial.adapter.UnsplashPhotoAdapter
@@ -30,7 +33,7 @@ private const val ARG_PARAM2 = "param2"
  */
 
 @AndroidEntryPoint
-class GalleryFragment : Fragment() {
+class GalleryFragment : Fragment(), MenuProvider {
     private val viewModel by viewModels<GalleryViewModel>()
     private var _binding: FragmentGalleryBinding? = null
     private val binding get() = _binding!!
@@ -46,17 +49,20 @@ class GalleryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentGalleryBinding.bind(view)
+     //   setHasOptionsMenu(true)
 
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.RESUMED)
 
         val adapter = UnsplashPhotoAdapter()
 
         binding.apply {
             recyclerView.setHasFixedSize(true)
             recyclerView.adapter = adapter.withLoadStateHeaderAndFooter(
-                header = UnsplashLoadStateAdapter{adapter.retry()},
-                footer = UnsplashLoadStateAdapter{adapter.retry()},
+                header = UnsplashLoadStateAdapter { adapter.retry() },
+                footer = UnsplashLoadStateAdapter { adapter.retry() },
 
-            )
+                )
         }
 
 
@@ -67,9 +73,36 @@ class GalleryFragment : Fragment() {
 
     }
 
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+        menuInflater.inflate(R.menu.menu_gallery, menu)
+        val searchItem = menu.findItem(R.id.action_search)
+        val searchView = searchItem.actionView as androidx.appcompat.widget.SearchView
+        searchView.setOnQueryTextListener(object : OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                if (query != null) {
+                    binding.recyclerView.scrollToPosition(0)
+                    viewModel.getSearchResult(query)
+                    searchView.clearFocus()
+
+                }
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                return false
+            }
+        })
+
+    }
+
+    override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+        return true
     }
 
 
