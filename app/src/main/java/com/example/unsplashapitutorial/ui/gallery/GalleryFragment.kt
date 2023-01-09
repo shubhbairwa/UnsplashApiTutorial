@@ -51,6 +51,9 @@ class GalleryFragment : Fragment(), UnsplashPhotoAdapter.OnItemClickListener, Me
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentGalleryBinding.bind(view)
 
+        print("DONT SHOW THIS STATEMENT")
+
+
         val adapter = UnsplashPhotoAdapter(this)
 
 
