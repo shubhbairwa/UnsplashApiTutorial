@@ -1,11 +1,21 @@
 package com.example.unsplashapitutorial.ui.details
 
+import android.content.Intent
+import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
+import androidx.navigation.fragment.navArgs
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
 import com.example.unsplashapitutorial.R
+import com.example.unsplashapitutorial.databinding.FragmentDetailsBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 // TODO: Rename parameter arguments, choose names that match
@@ -20,44 +30,58 @@ private const val ARG_PARAM2 = "param2"
  */
 
 @AndroidEntryPoint
-class DetailsFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+class DetailsFragment : Fragment(R.layout.fragment_details) {
+    private val args by navArgs<DetailsFragmentArgs>()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_details, container, false)
-    }
+        val binding = FragmentDetailsBinding.bind(view)
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment DetailsFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            DetailsFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+        binding.apply {
+            val photo = args.photo
+
+            Glide.with(this@DetailsFragment)
+                .load(photo.urls.full)
+                .error(R.drawable.ic_error)
+                .listener(object : RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: com.bumptech.glide.request.target.Target<Drawable>,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        progressBar.isVisible = false
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: com.bumptech.glide.request.target.Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        progressBar.isVisible = false
+                        textViewCreator.isVisible = true
+                        textViewDescription.isVisible = photo.description != null
+                        return false
+                    }
+                })
+                .into(imageView)
+
+            textViewDescription.text = photo.description
+
+            val uri = Uri.parse(photo.user.attributionUrl)
+            val intent = Intent(Intent.ACTION_VIEW, uri)
+
+            textViewCreator.apply {
+                text = "Photo by ${photo.user.name} on Unsplash"
+                setOnClickListener {
+                    context.startActivity(intent)
                 }
+                paint.isUnderlineText = true
             }
+        }
     }
 }
